@@ -1,38 +1,45 @@
 tabuleiro([9,
-	[0,0,0,1,1,1,0,0,0],
-	[0,0,0,0,1,0,0,0,0],
-	[0,0,1,0,2,2,0,0,0],
-	[1,0,0,0,2,0,0,0,1],
-	[1,0,0,2,0,0,0,1,1],
-	[1,0,0,0,2,0,0,0,1],
-	[0,0,0,0,2,0,2,0,0],
-	[0,2,0,0,0,0,k,0,0],
-	[0,0,0,1,1,1,0,1,0]]).
+	['_','_','_',b,b,b,'_','_','_'],
+	['_','_','_','_',b,'_','_','_','_'],
+	['_','_',b,'_',w,w,'_','_','_'],
+	[b,'_','_','_',w,'_','_','_',b],
+	[b,'_','_',w,'_','_','_',b,b],
+	[b,'_','_','_',w,'_','_','_',b],
+	['_','_','_','_',w,'_',w,'_','_'],
+	['_',w,'_','_','_','_',k,'_','_'],
+	['_','_','_',b,b,b,'_',b,'_']]).
 
-positions([
-		[00,01,02,03,04,05,06,07,08]]).
 
-printtopline(X,X).
+printtopline(X,X):-
+	write(X),
+	nl.
 
 printtopline(X,Y):-
-	write(X),
+	write(Y),
 	write(' '),
-	Y2 is Y+1,
-	printtopline(X,Y2).
+	YW is Y+1,
+	printtopline(X,YW).
+
+printSideLine(X):-
+	write(X),
+	write(' ').
 
 printSboard([X|Y]):-
 	printtopline(X,0),
-	printBoard(Y).
+	printBoard(Y,1).
 
 printBoard([]).
 
-printBoard([H]) :-
+printBoard([H],C) :-
+		printSideLine(C),
 		printLine(H).
 
-printBoard([X|Y]) :-
+printBoard([X|Y],C) :-
+		printSideLine(C),
 		printLine(X),
 		nl,
-		printBoard(Y).
+		NC is C+1,
+		printBoard(Y,NC).
 
 printLine([]).
 printLine([H]) :-
@@ -45,4 +52,5 @@ printLine([X|Y]):-
 
 game:-
 
-tabuleiro(Board), printSboard(Board).
+tabuleiro(Board),
+printSboard(Board).
