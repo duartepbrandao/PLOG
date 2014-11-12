@@ -1,12 +1,12 @@
 tabuleiro([9,
 	['-','-','-','b','b','b','-','-','-'],
-	['-','-','-','-','b','-','-','-	','-'],
+	['-','-','-','-','b','-','-','-','-'],
 	['-','-','-','-','w','-','-','-','-'],
 	['b','-','-','-','w','-','-','-','b'],
 	['b','b','w','w','-','w','w','b','b'],
 	['b','-','-','-','w','-','-','-','b'],
 	['-','-','-','-','w','-','-','-','-'],
-	['-','-','-','-','w','-','-','-','-'],
+	['-','b','-','k','b','-','-','-','-'],
 	['-','-','-','b','b','b','-','-','-']]).
 
 :- op(1000,xfy,'or').
@@ -51,6 +51,8 @@ printLine([X|Y]):-
 		write(' '),
 		printLine(Y).
 
+getPieceFromLine([],_,_,_,_,_):-
+	!,fail.
 
 getPieceFromLine([H|T],H,X,Y,X,Y).
 
@@ -58,8 +60,12 @@ getPieceFromLine([H|T],Piece,X,Y,Xcounter,Y):-
 	NewXcounter is Xcounter+1,
 	getPieceFromLine(T,Piece,X,Y,NewXcounter,Y).
 
+getPiece([],_,_,_,_,_):-
+	!,fail.
+
 getPiece([H|T],Piece,X,Y,Xcounter,Y):-
-	getPieceFromLine(H,Piece,X,Y,Xcounter,Y).
+	(getPieceFromLine(H,Piece,X,Y,Xcounter,Y));
+	(!,fail).
 
 getPiece([H|T],Piece,X,Y,Xcounter,Ycounter):-
 	NewYcounter is Ycounter+1,
@@ -82,7 +88,8 @@ chooseDest(Player,X,Y):-
 	validatePiece(Player,Piece):-
 		(Player = 'b',Piece='b');
 		(Player='-',Piece='-');
-		(Player = 'w',(Piece='w' ;Piece='k')).
+		(Player = 'w',(Piece='w' ;Piece='k'));
+		(!,fail).
 
 	changePlayer(Player,NewPlayer):-
 		(Player='b',NewPlayer= 'w');
@@ -194,10 +201,29 @@ checkEnd([H|T]):-
 	getKing(T,X,Y),
 	(assessPosition(H,X,Y)).
 
+capture(Board,NewBoard,Player,X,Y,X3,Y3):-
+	getPiece(Board,Piece,X,Y,1,1),
+	changePlayer(Player,NewPlayer),
+	validatePiece(Piece,NewPlayer),
+	getPiece(Board,Piece2,X3,Y3,1,1),
+	validatePiece(Piece2,Player),
+	replaceElement(Y,X,'-',Board,NewBoard).
 
-%captures(NewBoard,NewBoard2,Player,X2,Y2):-
 
-
+captures([H|T],NewBoard2,Player,X2,Y2):-
+	(YN is Y2-1,
+	YS is Y2+1,
+	XW is X2-1,
+	XE is X2+1,
+	YN2 is Y2-2,
+	YS2 is Y2+2,
+	XW2 is X2-2,
+	XE2 is X2+2),
+	((capture(T,Temp1,Player,X2,YN,X2,YN2);copyList(T,Temp1)),
+	(capture(Temp1,Temp2,Player,X2,YS,X2,YS2);copyList(Temp1,Temp2)),
+	(capture(Temp2,Temp3,Player,XW,Y2,XW2,Y2);copyList(Temp2,Temp3)),
+	(capture(Temp3,Temp4,Player,XE,Y2,XE2,Y2);copyList(Temp3,Temp4)),
+	copyList([H|Temp4], NewBoard2)).
 
 
 gameCicle([H|T],Player):-
@@ -209,11 +235,11 @@ gameCicle([H|T],Player):-
 	validatePiece('-',Piece2),
 	validMove(T,X,Y,X2,Y2),
 	move([H|T],NewBoard,Piece,X,Y,X2,Y2),
-	%captures(NewBoard,NewBoard2,Player,X2,Y2),
-	checkEnd(NewBoard),
-	printSboard(NewBoard),
+	captures(NewBoard,NewBoard2,Player,X2,Y2),
+	checkEnd(NewBoard2),
+	printSboard(NewBoard2),
 	changePlayer(Player,NewPlayer),
-	gameCicle(NewBoard,NewPlayer));
+	gameCicle(NewBoard2,NewPlayer));
 	(write('Invalid Choice!'),nl,gameCicle([H|T],Player)).
 
 
