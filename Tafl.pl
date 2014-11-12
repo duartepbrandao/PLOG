@@ -1,9 +1,9 @@
 tabuleiro([9,
 	['-','-','-','b','b','b','-','-','-'],
-	['-','-','-','-','b','-','-','-','-'],
+	['-','-','-','-','b','-','-','-	','-'],
 	['-','-','-','-','w','-','-','-','-'],
 	['b','-','-','-','w','-','-','-','b'],
-	['b','b','w','w','k','w','w','b','b'],
+	['b','b','w','w','-','w','w','b','b'],
 	['b','-','-','-','w','-','-','-','b'],
 	['-','-','-','-','w','-','-','-','-'],
 	['-','-','-','-','w','-','-','-','-'],
@@ -168,16 +168,30 @@ gameOver(Player):-
 	write(Player),
 	write(' has won!!!'),break.
 
-assessPosition(Size,X,Y):-
-	(X is 1,gameOver('a'));
-	(X is Size, gameOver('a'));
-	(Y is 1,gameOver('a'));
-	(Y is Size,gameOver('a')).
+
+assessPosition(Size,0,0):-
+	gameOver('b').
+
+assessPosition(Size,1,_):-
+	gameOver('a').
+
+assessPosition(Size,Size,_):-
+	gameOver('a').
+
+
+assessPosition(Size,_,1):-
+gameOver('a').
+
+
+assessPosition(Size,_,Size):-
+gameOver('a').
+
+assessPosition(Size,X,Y).
+
+
 
 checkEnd([H|T]):-
 	getKing(T,X,Y),
-	(X is 0,Y is 0,
-	gameOver('b'));
 	(assessPosition(H,X,Y)).
 
 
@@ -196,7 +210,7 @@ gameCicle([H|T],Player):-
 	validMove(T,X,Y,X2,Y2),
 	move([H|T],NewBoard,Piece,X,Y,X2,Y2),
 	%captures(NewBoard,NewBoard2,Player,X2,Y2),
-	%checkEnd(NewBoard),
+	checkEnd(NewBoard),
 	printSboard(NewBoard),
 	changePlayer(Player,NewPlayer),
 	gameCicle(NewBoard,NewPlayer));
