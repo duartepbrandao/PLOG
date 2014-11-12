@@ -1,13 +1,13 @@
 tabuleiro([9,
 	['-','-','-','b','b','b','-','-','-'],
-	['-','-','-','b','b','-','-','-','-'],
-	['-','k','b','-',w,w,'-','-','-'],
-	['b','w','-','-',w,'-','-','-',b],
-	[b,'-','-',w,'-','-','-',b,b],
-	[b,'-','-','-',w,'-','-','-',b],
-	['-','-','-','-',w,'-',w,'-','-'],
-	['-',w,'-','-','-','-','-','-','-'],
-	['-','-','-',b,b,b,'-',b,'-']]).
+	['-','-','-','-','b','-','-','-','-'],
+	['-','-','-','-','w','-','-','-','-'],
+	['b','-','-','-','w','-','-','-','b'],
+	['b','b','w','w','k','w','w','b','b'],
+	['b','-','-','-','w','-','-','-','b'],
+	['-','-','-','-','w','-','-','-','-'],
+	['-','-','-','-','w','-','-','-','-'],
+	['-','-','-','b','b','b','-','-','-']]).
 
 :- op(1000,xfy,'or').
 
@@ -181,8 +181,8 @@ checkEnd([H|T]):-
 	(assessPosition(H,X,Y)).
 
 
-captures(NewBoard,NewBoard2,Player,X2,Y2):-
-	
+%captures(NewBoard,NewBoard2,Player,X2,Y2):-
+
 
 
 
@@ -195,7 +195,7 @@ gameCicle([H|T],Player):-
 	validatePiece('-',Piece2),
 	validMove(T,X,Y,X2,Y2),
 	move([H|T],NewBoard,Piece,X,Y,X2,Y2),
-	captures(NewBoard,NewBoard2,Player,X2,Y2),
+	%captures(NewBoard,NewBoard2,Player,X2,Y2),
 	%checkEnd(NewBoard),
 	printSboard(NewBoard),
 	changePlayer(Player,NewPlayer),
