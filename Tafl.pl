@@ -1,13 +1,15 @@
 tabuleiro([9,
 	['-','-','-','b','b','b','-','-','-'],
 	['-','-','-','b','b','-','-','-','-'],
-	['-','-','b','-',w,w,'-','-','-'],
+	['-','k','b','-',w,w,'-','-','-'],
 	['b','w','-','-',w,'-','-','-',b],
 	[b,'-','-',w,'-','-','-',b,b],
 	[b,'-','-','-',w,'-','-','-',b],
 	['-','-','-','-',w,'-',w,'-','-'],
-	['-',w,'-','-','-','-',k,'-','-'],
+	['-',w,'-','-','-','-','-','-','-'],
 	['-','-','-',b,b,b,'-',b,'-']]).
+
+:- op(1000,xfy,'or').
 
 printtopline(X,X):-
 	write(X),
@@ -83,8 +85,8 @@ chooseDest(Player,X,Y):-
 		(Player = 'w',(Piece='w' ;Piece='k')).
 
 	changePlayer(Player,NewPlayer):-
-		(Player='b',NewPlayer is 'w');
-		NewPlayer is 'b'.
+		(Player='b',NewPlayer= 'w');
+		NewPlayer = 'b'.
 
 		validMoveVertical(Board,X,Y,Y).
 
@@ -136,26 +138,73 @@ replaceElementAux(1, NewValue, [_|T], [NewValue|T]).
 
 copyList([H|T],[H|T]).
 
-	move([H|T],NewBoard,Piece,X,Y,X2,Y2):-
+move([H|T],NewBoard,Piece,X,Y,X2,Y2):-
 			replaceElement(Y,X,'-',T,NewBoard2),
 			replaceElement(Y2,X2,Piece,NewBoard2,NewBoard3),
 			copyList([H|NewBoard3],NewBoard).
 
-startGame([H|T]):-
-	(choosePiece('b',X,Y),
+indexOf([Element|_], Element, 1):- !.
+indexOf([_|Tail], Element, Index):-
+  indexOf(Tail, Element, Index1),
+  !,
+  Index is Index1+1.
+
+getPos([],X,Y,Xcounter,Ycounter):-
+	X=0,
+	Y=0.
+
+getPos([H|T],X,Y,Xcounter,Ycounter):-
+	(indexOf(H,'k',X),Y is Ycounter+1,!);
+	(
+	Ycounter2 is Ycounter +1,getPos(T,X,Y,Xcounter,Ycounter2)).
+
+getKing([H|T],X,Y):-
+	getPos(T,X,Y,1,1),
+	write(X),write(Y),
+	nl.
+
+gameOver(Player):-
+	nl,
+	write(Player),
+	write(' has won!!!'),break.
+
+assessPosition(Size,X,Y):-
+	(X is 1,gameOver('a'));
+	(X is Size, gameOver('a'));
+	(Y is 1,gameOver('a'));
+	(Y is Size,gameOver('a')).
+
+checkEnd([H|T]):-
+	getKing(T,X,Y),
+	(X is 0,Y is 0,
+	gameOver('b'));
+	(assessPosition(H,X,Y)).
+
+
+captures(NewBoard,NewBoard2,Player,X2,Y2):-
+	
+
+
+
+gameCicle([H|T],Player):-
+	(choosePiece(Player,X,Y),
 	getPiece(T,Piece,X,Y,1,1),
-	validatePiece('b',Piece),
-	chooseDest('b',X2,Y2),
+	validatePiece(Player,Piece),
+	chooseDest(Player,X2,Y2),
 	getPiece(T,Piece2,X2,Y2,1,1),
 	validatePiece('-',Piece2),
 	validMove(T,X,Y,X2,Y2),
-	%trace,
 	move([H|T],NewBoard,Piece,X,Y,X2,Y2),
-	printSboard(NewBoard));
-	(write('Invalid Choice!'),nl,startGame([H|T])).
+	captures(NewBoard,NewBoard2,Player,X2,Y2),
+	%checkEnd(NewBoard),
+	printSboard(NewBoard),
+	changePlayer(Player,NewPlayer),
+	gameCicle(NewBoard,NewPlayer));
+	(write('Invalid Choice!'),nl,gameCicle([H|T],Player)).
+
 
 
 game:-
 tabuleiro(Board),
 printSboard(Board),
-startGame(Board).
+gameCicle(Board,'b').
