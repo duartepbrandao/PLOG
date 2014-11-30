@@ -6,7 +6,7 @@ tabuleiro([9,
 	['b','b','w','w','-','w','w','b','b'],
 	['b','-','-','-','w','-','-','-','b'],
 	['-','-','-','-','w','-','-','-','-'],
-	['-','b','-','k','b','-','-','-','-'],
+	['-','b','-','-','b','-','-','k','-'],
 	['-','-','-','b','b','b','-','-','-']]).
 
 :- op(1000,xfy,'or').
@@ -88,7 +88,7 @@ chooseDest(Player,X,Y):-
 	validatePiece(Player,Piece):-
 		(Player = 'b',Piece='b');
 		(Player='-',Piece='-');
-		(Player = 'w',(Piece='w' ;Piece='k'));
+		((Player = 'w';Player='k'),(Piece='w' ;Piece='k'));
 		(!,fail).
 
 	changePlayer(Player,NewPlayer):-
@@ -236,8 +236,8 @@ gameCicle([H|T],Player):-
 	validMove(T,X,Y,X2,Y2),
 	move([H|T],NewBoard,Piece,X,Y,X2,Y2),
 	captures(NewBoard,NewBoard2,Player,X2,Y2),
+printSboard(NewBoard2),
 	checkEnd(NewBoard2),
-	printSboard(NewBoard2),
 	changePlayer(Player,NewPlayer),
 	gameCicle(NewBoard2,NewPlayer));
 	(write('Invalid Choice!'),nl,gameCicle([H|T],Player)).
