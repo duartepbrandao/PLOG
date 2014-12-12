@@ -195,8 +195,6 @@ gameOver('a').
 
 assessPosition(Size,X,Y).
 
-
-
 checkEnd([H|T]):-
 	getKing(T,X,Y),
 	(assessPosition(H,X,Y)).
